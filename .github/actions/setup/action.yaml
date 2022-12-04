@@ -1,0 +1,31 @@
+name: terraform setup
+description: terraform setup and init
+
+inputs:
+  env:
+    description: "environment"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Install gettext
+      run: sudo apt-get install gettext
+      shell: sh
+
+    - name: Make backend.tf
+      env:
+        ENV: ${{ inputs.env }}
+      run: envsubst '$$ENV' < backend.tf.template > backend.tf
+      shell: sh
+
+    - name: Confirm
+      run: cat backend.tf
+      shell: sh
+
+    - name: Terraform init
+      run: terraform init
+      shell: sh

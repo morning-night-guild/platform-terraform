@@ -1,0 +1,34 @@
+name: preview
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/preview.yaml
+      - '**.tf'
+      - '**.hcl'
+      - '**.template'
+
+env:
+  COCKROACH_API_KEY: ${{ secrets.COCKROACH_API_KEY }} 
+  TF_TOKEN_app_terraform_io: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+  TF_VAR_env: prev
+  TF_VAR_sql_user_password: ${{ secrets.COCKROACH_SQL_USER_PASSWORD }}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          env: prev
+
+      - name: Terraform plan
+        run: terraform plan
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve

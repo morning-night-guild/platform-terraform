@@ -1,0 +1,33 @@
+name: lint
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/lint.yaml
+      - '**.tf'
+      - '**.hcl'
+      - '**.template'
+
+env: 
+  COCKROACH_API_KEY: ${{ secrets.COCKROACH_API_KEY }} 
+  TF_TOKEN_app_terraform_io: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform format
+        run: terraform fmt -recursive -check
+
+      - name: Terraform validate
+        run: terraform validate

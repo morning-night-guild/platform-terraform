@@ -1,0 +1,33 @@
+name: apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/apply.yaml
+      - '**.tf'
+      - '**.hcl'
+      - '**.template'
+
+env: 
+  COCKROACH_API_KEY: ${{ secrets.COCKROACH_API_KEY }} 
+  TF_TOKEN_app_terraform_io: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN }}
+  TF_VAR_env: prod
+  TF_VAR_sql_user_password: ${{ secrets.COCKROACH_SQL_USER_PASSWORD }}
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+        with:
+          env: prod
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve
